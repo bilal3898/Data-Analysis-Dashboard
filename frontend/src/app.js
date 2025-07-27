@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import { DatasetProvider } from "@/context/DatasetContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/sidebar";
 import Header from "@/components/Header";
-import Dashboard from "@/pages/Dashboard";
-import Analysis from "@/pages/Analysis";
-import ModelTraining from "@/pages/ModelTraining";
-import Reports from "@/pages/Reports";
-import Settings from "@/pages/Settings";
+import Dashboard from "@/Pages/dashboard";
+import Analysis from "@/Pages/Analysis";
+import ModelTraining from "@/Pages/ModelTraining";
+import Reports from "@/Pages/Reports";
+import Settings from "@/Pages/Settings";
 import "./styles/global.css";
 
 const Layout = ({ children }) => {
