@@ -4,7 +4,6 @@ from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 from models.dataset_model import Dataset
 from config.db import db
-from app import app
 from services.data_cleaning import clean_dataset
 
 upload_bp = Blueprint("upload", __name__)
@@ -30,7 +29,7 @@ def upload_file():
         try:
             # Secure the filename
             filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
 
             # Save the file to the uploads folder
             file.save(filepath)
@@ -61,7 +60,7 @@ def upload_file():
                 print("Continuing with original data")
 
             # Save the cleaned dataset back to file
-            cleaned_filepath = os.path.join(app.config["UPLOAD_FOLDER"], f"cleaned_{filename}")
+            cleaned_filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], f"cleaned_{filename}")
             try:
                 if filename.endswith(".csv"):
                     df.to_csv(cleaned_filepath, index=False)
