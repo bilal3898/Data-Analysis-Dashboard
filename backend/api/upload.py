@@ -1,11 +1,11 @@
 import os
 import pandas as pd
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from werkzeug.utils import secure_filename
 from models.dataset_model import Dataset
 from config.db import db
 from app import app
-from services.data_cleaning import clean_dataset  # Import the cleaning function
+from services.data_cleaning import clean_dataset
 
 upload_bp = Blueprint("upload", __name__)
 
@@ -34,45 +34,78 @@ def upload_file():
 
             # Save the file to the uploads folder
             file.save(filepath)
+            print(f"File saved to: {filepath}")
 
             # Load dataset
-            if filename.endswith(".csv"):
-                df = pd.read_csv(filepath)
-            elif filename.endswith(".xlsx"):
-                df = pd.read_excel(filepath)
-            elif filename.endswith(".json"):
-                df = pd.read_json(filepath)
-            else:
-                return jsonify({"error": "Unsupported file format"}), 400
+            try:
+                if filename.endswith(".csv"):
+                    df = pd.read_csv(filepath)
+                elif filename.endswith(".xlsx"):
+                    df = pd.read_excel(filepath)
+                elif filename.endswith(".json"):
+                    df = pd.read_json(filepath)
+                else:
+                    return jsonify({"error": "Unsupported file format"}), 400
+                print(f"Dataset loaded with {len(df)} rows")
+            except Exception as e:
+                print(f"Error loading file: {str(e)}")
+                return jsonify({"error": f"Error loading file: {str(e)}"}), 400
 
-            # Clean the dataset
-            df = clean_dataset(df)
+            # Clean the dataset with error handling
+            try:
+                original_rows = len(df)
+                df = clean_dataset(df)
+                print(f"Dataset cleaned: {original_rows} -> {len(df)} rows")
+            except Exception as e:
+                print(f"Error cleaning dataset: {str(e)}")
+                print("Continuing with original data")
 
             # Save the cleaned dataset back to file
             cleaned_filepath = os.path.join(app.config["UPLOAD_FOLDER"], f"cleaned_{filename}")
-            df.to_csv(cleaned_filepath, index=False) if filename.endswith(".csv") else \
-                df.to_excel(cleaned_filepath, index=False) if filename.endswith(".xlsx") else \
-                df.to_json(cleaned_filepath, orient="records")
+            try:
+                if filename.endswith(".csv"):
+                    df.to_csv(cleaned_filepath, index=False)
+                elif filename.endswith(".xlsx"):
+                    df.to_excel(cleaned_filepath, index=False)
+                else:
+                    df.to_json(cleaned_filepath, orient="records")
+                print(f"Cleaned file saved to: {cleaned_filepath}")
+            except Exception as e:
+                print(f"Error saving cleaned file: {str(e)}")
+                return jsonify({"error": f"Error saving cleaned file: {str(e)}"}), 500
 
             # Create dataset record in the database
-            dataset = Dataset(
-                name=filename,
-                file_path=cleaned_filepath,  # Store the cleaned file path
-                file_type=filename.rsplit(".", 1)[1].lower(),
-                processed=True  # Mark as processed
-            )
+            try:
+                dataset = Dataset(
+                    name=filename,
+                    file_path=cleaned_filepath,
+                    file_type=filename.rsplit(".", 1)[1].lower(),
+                    columns=list(df.columns),
+                    row_count=len(df),
+                    processed=True
+                )
 
-            db.session.add(dataset)
-            db.session.commit()
+                db.session.add(dataset)
+                db.session.commit()
+                print(f"Dataset saved to database with ID: {dataset.id}")
+            except Exception as e:
+                print(f"Error saving to database: {str(e)}")
+                db.session.rollback()
+                return jsonify({"error": f"Error saving to database: {str(e)}"}), 500
 
             return jsonify({
                 "message": "File uploaded and cleaned successfully",
                 "dataset_id": dataset.id,
                 "file_name": dataset.name,
-                "file_path": dataset.file_path
+                "file_path": dataset.file_path,
+                "row_count": dataset.row_count,
+                "columns": dataset.columns
             }), 200
 
         except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     return jsonify({"error": "Invalid file type"}), 400
