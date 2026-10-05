@@ -5,11 +5,11 @@ import { DatasetProvider } from "@/context/DatasetContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import Sidebar from "@/components/sidebar";
 import Header from "@/components/Header";
-import Dashboard from "@/Pages/dashboard";
-import Analysis from "@/Pages/Analysis";
-import ModelTraining from "@/Pages/ModelTraining";
-import Reports from "@/Pages/Reports";
-import Settings from "@/Pages/Settings";
+import Dashboard from "@/pages/dashboard";
+import Analysis from "@/pages/Analysis";
+import ModelTraining from "@/pages/ModelTraining";
+import Reports from "@/pages/Reports";
+import Settings from "@/pages/Settings";
 import "./styles/global.css";
 
 const Layout = ({ children }) => {

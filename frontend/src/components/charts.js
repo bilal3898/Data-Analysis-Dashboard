@@ -4,7 +4,7 @@ import {
   Line, Bar, Pie, Scatter, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, Cell
 } from "recharts";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui.js";
 import { BarChart2, PieChart as PieChartIcon, ScatterPlot, LineChart as LineChartIcon } from "lucide-react";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];

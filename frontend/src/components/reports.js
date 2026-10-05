@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui";
+import { Button } from "@/components/ui.js";
 import { Download, FileText, Trash2, FileSpreadsheet } from "lucide-react";
 
 const Reports = () => {

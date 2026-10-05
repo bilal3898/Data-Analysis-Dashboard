@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui";
-import { Button, Input, Label } from "@/components/ui";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui.js";
+import { Button, Input, Label } from "@/components/ui.js";
 import { Brain, RefreshCw, BarChart2, Save } from "lucide-react";
 
 const ModelTraining = ({ dataset, onTrain }) => {
